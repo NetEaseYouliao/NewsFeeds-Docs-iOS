@@ -1,0 +1,1 @@
+../../../YLGDTMobSDK/libGDTMobSDK/GDTNativeAd.h

@@ -1,0 +1,8 @@
+platform :ios, '9.0'
+
+target :NewsFeedsUIDemo do
+  pod 'UITableView+FDTemplateLayoutCell'
+  pod 'Masonry'
+  pod 'SDWebImage/WebP'
+  pod 'SDWebImage/GIF'
+end

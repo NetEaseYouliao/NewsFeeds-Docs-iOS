@@ -1,0 +1,1 @@
+../../../YLGDTMobSDK/libGDTMobSDK/GDTSplashAd.h

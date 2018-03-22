@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable = no ">
+    <meta name="keywords" content="Angel">
+    <meta name="description" content="Angel">
+    <meta name="format-detection" content="telephone=no" />
+    <title>Angel</title>
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <link rel="stylesheet" type="text/css" href="pnotify.custom.min.css">
+
+</head>
+
+<body class="ff-a ios-device">
+    
+    
+    <article>
+        <header>
+            <h4 class="title" id="news-title">
+                <--title-->
+            </h4>
+            <div class="source-info clearfix">
+                <div class="info clearfix">
+                    <span id="news-origin"><--src--></span>
+                    <span class="pull-right ml5" id="news-pubtime"><--datetime--></span>
+                </div>
+            </div>
+
+        </header>
+        <section class="content" id="news-content">
+            <--content-->
+                <div class="accuse">
+                    <p>
+                        <span class="btn">报错</span>
+                    </p>
+                </div>
+
+                <div class="ad">
+                </div>
+
+        </section>
+        <section class="share">
+            <div class="shareWrap">
+                <div class="webchat">
+                    <a href="javascript:;" id="webchat">
+                        <img src="details_icon_wechat_normal@2x.png"  height="60" width="60" alt="">
+                    </a>
+                    <span>微信好友</span>
+                </div>
+                <div class="shareHeader">
+                    <span class="title">分享</span>
+                </div>
+                <div class="friends">
+                    <a href="javascript:;" id="friends">
+                        <img src="details_icon_friends_normal@2x.png"  height="60" width="60" alt="">
+                    </a>
+                    <span>朋友圈</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="related">
+            <!--related-->
+        </section>
+    </article>
+    <section class="accusePage">
+        <header>
+            请选择投诉原因
+        </header>
+        <section class="option">
+            <ul>
+                <li>
+
+                    <label class="demo--label" for="1">
+                        <input class="demo--radio" type="radio" value="1" id="1" name="optionItem">
+                            <span class="demo--radioInput"></span>广告
+                            </label>
+                </li>
+                <li>
+                    <label class="demo--label" for="2">
+                        <input class="demo--radio" type="radio" value="2" id="2" name="optionItem">
+                            <span class="demo--radioInput"></span>低俗色情
+                            </label>
+                </li>
+                <li>
+                    <label class="demo--label" for="3">
+                        <input class="demo--radio" type="radio" value="3" id="3" name="optionItem">
+                            <span class="demo--radioInput"></span>反动不良
+                            </label>
+                </li>
+                <li>
+                    <label class="demo--label" for="4">
+                        <input class="demo--radio" type="radio" value="4" id="4" name="optionItem">
+                            <span class="demo--radioInput"></span>老旧重复内容
+                            </label>
+                </li>
+                <li>
+                    <label class="demo--label" for="5">
+                        <input class="demo--radio" type="radio" value="5" id="5" name="optionItem">
+                            <span class="demo--radioInput"></span>标题党
+                            </label>
+                </li>
+                <li>
+                    <label class="demo--label" for="6">
+                        <input class="demo--radio" type="radio" value="6" id="6" name="optionItem">
+                            <span class="demo--radioInput"></span>内容排版有误
+                            </label>
+                </li>
+                <li>
+                    <label class="demo--label" for="7">
+                        <input class="demo--radio" type="radio" value="7" id="7" name="optionItem">
+                            <span class="demo--radioInput"></span>疑似抄袭
+                            </label>
+                </li>
+                <li>
+                    <label class="demo--label" for="8">
+                        <input class="demo--radio" type="radio" value="8" id="8" name="optionItem">
+                            <span class="demo--radioInput"></span>谣言
+                            </label>
+                </li>
+                <li>
+                    <label class="demo--label" for="9">
+                        <input class="demo--radio" type="radio" value="9" id="9" name="optionItem">
+                        <span class="demo--radioInput"></span>其他
+                    </label>
+                </li>
+            </ul>
+            <div class="otherWrapper">
+                <textarea  autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" name="" id="" rows="3" class="other" placeholder="请具体说明问题，我们将尽快处理"></textarea>
+            </div>
+        </section>
+        <div class="submitWrapper">
+            <a href="javascript:;" class="submit">提交</a>
+        </div>
+    </section>
+    <style type="text/css">
+
+        .share {
+            /* display: none; */
+        }
+
+        .shareWrap {
+            display: flex;
+            height: 160px;
+            flex-direction: row;
+            align-items: center;
+            border-top: 1px solid #f1f4f7;
+            border-bottom: 1px solid #f1f4f7;
+            position: relative;
+        }
+
+        .webchat,
+        .friends {
+            flex: 1;
+        }
+
+        .webchat>a,
+        .friends>a {
+            display: block;
+            width: 65px;
+            height: 65px;
+        }
+
+        .webchat>a {
+            float: right;
+        }
+
+        .friends>a {
+            float: left;
+        }
+
+        .webchat>a>img,
+        .friends>a>img {
+            width: 100%;
+            height: 100%;
+        }
+
+
+        .webchat>span,
+        .friends>span {
+            display: block;
+            width: 65px;
+            margin-top: 10px;
+            text-align: center;
+            clear: both;
+        }
+
+        .webchat>span {
+            float: right;
+        }
+
+        .friends>span {
+            float: left;
+        }
+
+        .shareHeader {
+            flex: 0 0 80px;
+        }
+
+        .shareHeader>.title {
+            position: absolute;
+            line-height: 32px;
+            top: -16px;
+            left: calc(50% - 40px);
+            width: 80px;
+            background: #fff;
+            text-align: center;
+        }
+    </style>
+
+    <style type="text/css">
+        /*mmmmmmmmmmmmmmmmmmm sssssssssssss llllllllll*/
+        [contenteditable = "true"], input, textarea {
+            -webkit-user-select: auto!important;
+            -khtml-user-select: auto!important;
+            -moz-user-select: auto!important;
+            -ms-user-select: auto!important;
+            -o-user-select: auto!important;
+            user-select: auto!important;
+        }
+         /*mmmmmmmmmmmmmmmmmmm sssssssssssss llllllllll*/
+        .gap {
+            background: #f9f9f9;
+            margin: 0 auto;
+            height: 12px;
+            border-top: 1px solid #ededed;
+            border-bottom: 1px solid #ededed;
+        }
+
+        .relatedTitle {
+            padding: 20px 15px 5px 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .relatedWrapper {
+            padding: 0px 15px;
+            font-size: 0;
+        }
+
+        .adwrapper {
+            margin: 0;
+            background: #f9f9f9;
+            padding: 9px 15px;
+            border: 1px solid #ededed;
+        }
+    
+        .ad {
+            /*border: 1px solid #ededed;*/
+        }
+
+        .relatedWrapper>.item {
+            padding: 9px 0;
+            border-bottom: 1px solid #f1f4f7;
+        }
+
+        * {
+            -webkit-touch-callout: none;
+            -webkit-text-size-adjust: none;
+            -webkit-user-select: none;
+        }
+
+        .item .imgItem {
+            margin-bottom: 4px;
+        }
+
+        .item .title {
+            font-size: 17px;
+            color: #333;
+            font-family: PingFangSC-Regular, sans-serif;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 25px;
+            text-align: left;
+        }
+
+        .adtitle {
+            font-size: 15px;
+            color: #333;
+            font-family: PingFangSC-Regular, sans-serif;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 25px;
+            text-align: left;
+            height: 48px;
+        }
+
+        .item .footer {
+            font-size: 11px;
+            color: #a5a5a5;
+            margin: 10px 0px 0px 0px
+        }
+
+        .adfooter {
+            font-size: 12px;
+            color: #ffffff;
+            background: #bababa;
+            margin: 10px 0px 0px 0px;
+            text-align: center;
+            width: 32px;
+            height: 16px;
+            border-radius: 2px;
+            vertical-align: middle;
+            line-height: 16px;
+        }
+
+        .item img {
+            max-width: 100%;
+        }
+        /* 3：三图模式， 2：大图模式，1：缩略图模式，0：无图 */
+
+        .item-img3>.imgList {
+            margin: 11px 0px 0px 0px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .item-img3>.imgList>.imgItem {
+            flex: 0 0 30%;
+            width: 30%;
+        }
+
+        .item-img2>.imgList {
+            margin: 11px 0px 0px 0px;
+        }
+
+        .item-img2>.imgList>.imgItem {
+            width: 100%;
+        }
+
+        .item-img1>.container,
+        .adcontainer {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .item-img1>.container>.left,
+        .adcontainer>.left {
+            display: flex;
+            flex: 0 0 63%;
+            width: 63%;
+            flex-direction: column;
+        }
+
+        .adcontainer>.left {
+            flex: 0 0 50%;
+            width: 50%;
+            /*margin-left: 15px;*/
+            justify-content:center;
+        }
+
+        .adcontainer>.right {
+            /*margin-right: 15px;
+            margin-top: 5px;*/
+            align-self: center;
+        }
+
+
+        .item-img1>.container>.right,
+        .adcontainer>.right {
+            width: 100px;
+            height: 66px;
+        }
+
+        .adcontainer>.right>.addImgWrap {
+            height: 100%;
+            width: 100%;
+            background-position: 50%;
+            background-size: cover;
+        }
+        /*报错样式*/
+
+        .accuse {
+            margin-top: -12px;
+        }
+
+        .accuse .btn {
+            cursor: pointer;
+            float: right;
+            height: 32px;
+            font-size: 14px;
+            line-height: 32px;
+            vertical-align: middle;
+            color: #ccc;
+        }
+
+        .accusePage {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            display: none;
+        }
+
+        .accusePage header {
+            height: 48px;
+            padding: 0 15px;
+            margin: 0;
+            line-height: 48px;
+            font-size: 14px;
+            vertical-align: middle;
+            background: #f9f9f9;
+            color: #666;
+        }
+
+
+        .accusePage .option ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .accusePage .option li {
+            padding: 10px 15px;
+            border: 1px solid #ededed;
+            border-bottom-color: transparent;
+        }
+
+        .accusePage .option li:last-child {
+            border-bottom-color: #ededed;
+        }
+
+        .accusePage .otherWrapper {
+            padding: 5px 6px 0 34px;
+        }
+
+        .accusePage .other {
+            display: none;
+            width: 100%;
+            padding: 8px;
+            margin: 0;
+            border-color: transparent;
+            background: #f7f7f9;
+            resize: none;
+        }
+
+        .accusePage .submitWrapper {
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            text-align: center;
+        }
+
+        .accusePage .submit {
+            display: inline-block;
+            width: 100%;
+            height: 48px;
+            font-size:18px;
+            line-height: 48px;
+            border-radius: 6px;
+            text-align: center;
+            color: #fff;
+            background: #0099fb;
+        }
+        /* .item */
+
+        .accusePage .option {
+            max-height: calc(100% - 90px);
+            overflow: auto;
+        }
+    
+    
+        .demo--label{display:inline-block}
+        .demo--radio{display:none}
+        .demo--radioInput{background-color:#fff;border:1px solid rgba(0,0,0,0.15);border-radius:100%;display:inline-block;height:16px;margin-right:10px;margin-top:-1px;vertical-align:middle;width:16px;line-height:1}
+        .demo--radio:checked + .demo--radioInput:after{background-color:#0099fb;border-radius:100%;content:"";display:inline-block;height:12px;margin:1px;width:12px}
+        .demo--checkbox.demo--radioInput,.demo--radio:checked + .demo--checkbox.demo--radioInput:after{border-radius:0}
+    </style>
+    <script id="adTMPL" type="text/html">
+        <div class="adwrapper">
+            <div class="adcontainer">
+                <div class="left">
+                    <div class="title adtitle">{{$data.title}}</div>
+                    <div class="adfooter">广告</div>
+                </div>
+                <div class="right">
+                    <div class="addImgWrap" style={{"background-image:url("+$data.imageUrl+")"}}></div>
+                    <!--<img src={{$data.imageUrl}} alt="" />-->
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script src="jquery.min.js"></script>
+    <script src="unveil.js"></script>
+    <script src="template-web.js"></script>
+    <script src="md5.min.js"></script>
+    <script src="pnotify.custom.min.js"></script>
+    <script id="realtedTMPL" type="text/html">
+        <div class="gap"></div>
+        <div class="relatedTitle">相关推荐</div>
+        <ul class="relatedWrapper">
+
+            {{each $data}} {{set imgType=$value.imgType}} {{if imgType==3}}
+            <li class="item item-img3">
+                <div class="title">{{$value.title}}</div>
+                <div class="imgList">
+                    {{each $value.thumbnails}}
+                    <div class="imgItem">
+                        <img src={{$value.url}} alt="" />
+                    </div>
+                    {{/each}}
+                </div>
+                <div class="footer">{{$value.source}}</div>
+            </li>
+            {{else if imgType==2}}
+            <li class="item item-img2">
+                <div class="title">
+                    <div class="title">{{$value.title}}</div>
+                </div>
+                <div class="imgList">
+                    {{each $value.thumbnails}}
+                    <div class="imgItem">
+                        <img src={{$value.url}} alt="" />
+                    </div>
+                    {{/each}}
+                </div>
+                <div class="footer">{{$value.source}}</div>
+            </li>
+            {{else if imgType==1}} {{set img=$value.thumbnails[0]}}
+            <li class="item item-img1">
+                <div class="container">
+                    <div class="left">
+                        <div class="title">{{$value.title}}</div>
+                        <div class="footer">{{$value.source}}</div>
+                    </div>
+                    <div class="right">
+                        <img src={{img.url}} alt="" />
+                    </div>
+                </div>
+            </li>
+            {{else if imgType==0}}
+            <li class="item item-img0">
+                <div class="title">{{$value.title}}</div>
+                <div class="footer">{{$value.source}}</div>
+            </li>
+            {{/if}} {{/each}}
+        </ul>
+    </script>
+    <script src="main.js"></script>
+</body>
+
+</html>
