@@ -84,7 +84,7 @@ _hybridContainerController.delegate = SomeOtherClass<NFHybridDelegate> instance;
    }
    ```
 
-实现NFHybridDelegate，完成web和native的通信。当前HybridSDK支持三种事件，分别是`init`, `openLink`, `share`.
+实现NFHybridDelegate，完成web和native的通信。当前HybridSDK支持三种事件，分别是`init`, `openLink`, `openLinkByParam`,`share`
 
 * init 
 
@@ -97,6 +97,9 @@ _hybridContainerController.delegate = SomeOtherClass<NFHybridDelegate> instance;
 * openLink
 
   当打开新闻详情时，会发起`openLink`事件，同时携带`url`参数。该事件不关心返回结果。
+* openLinkByParam
+
+  `openLinkByParam`和`openLink`的作用是一样的，区别在于`openLinkByParam`事件并非携带完整的`url`参数，而是一些结构化的数据，数据字段在`NFHybridNewsInfo`中有详细说明，用户将这些数据拼接成一个完整的`url`实现跳转。可参考示例代码。
 
 * share
 
