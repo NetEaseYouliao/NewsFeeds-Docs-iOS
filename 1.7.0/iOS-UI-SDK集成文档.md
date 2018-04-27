@@ -14,12 +14,12 @@ NewsFeedsUISDK提供的功能如下：
 - 信息流入口
 
 接入的模式有两种：
+
 - 快速集成信息流
-
     > 信息流的基本功能包含信息流主页、文章类新闻展示页、图集类新闻展示页等，若用户选择快速集成方式，则使用UI SDK提供的所有默认页面。
+    
 - 自定义集成信息流
-
-    > 用户可以根据UI SDK提供的回调，自定义交互逻辑。例如，点击新闻列表后的目标调转页面、点击相关推荐后的目标调转页面等等。
+   > 用户可以根据UI SDK提供的回调，自定义交互逻辑。例如，点击新闻列表后的目标调转页面、点击相关推荐后的目标调转页面等等。
 
 ---
 
@@ -27,21 +27,49 @@ NewsFeedsUISDK提供的功能如下：
 
 网易有料NewsFeedsUISDK主要提供了以下的类：
 
-- `NewsFeedsUISDK` 整个SDK的主入口，单例，主要提供创建信息流首页视图、创建新闻详情视图、创建图集浏览页面、创建文章详情图片浏览页面实例、创建信息流入口实例。提供的五种UI，实例创建必须通过该接口生成。
-- `NFeedsView`信息流首页视图类和`NFeedsViewDelegate`相关的回调接口
-- `NFArticleDetailView`文章详情的视图和`NFArticleDetailViewDelegate`相关的回调接口
-- `NFPicSetGalleryViewController`图集页面和`NFPicSetGalleryDelegate`相关的回调接口
-- `NFVideoBrowserViewController`视频浏览页面和`NFVideoBrowserDelegate`相关的回调接口
-- `NFArticleGalleryViewController`新闻详情的图片浏览页面和`NFArticleGalleryDelegate`相关的回调接口
-- `UIViewController<NFChannelControllerProtocol>`信息流小入口和`NFChannelControllerDelegate`相关的回调接口
+类|描述
+---- | -----
+NewsFeedsUISDK | 整个SDK的主入口，单例，主要提供创建信息流首页视图、创建新闻详情视图、创建图集浏览页面、创建文章详情图片浏览页面实例、创建信息流入口实例。提供的五种UI，实例创建必须通过该接口生成。
+NFeedsView | 信息流首页视图类和`NFeedsViewDelegate`相关的回调接口
+NFArticleDetailView | 文章详情的视图和`NFArticleDetailViewDelegate`相关的回调接口
+NFPicSetGalleryViewController | 图集页面和`NFPicSetGalleryDelegate`相关的回调接口
+NFVideoBrowserViewController | 视频浏览页面和`NFVideoBrowserDelegate`相关的回调接口
+NFArticleGalleryViewController  | 新闻详情的图片浏览页面和`NFArticleGalleryDelegate`相关的回调接口
+UIViewController<NFChannelControllerProtocol> | 信息流小入口和`NFChannelControllerDelegate`相关的回调接口
 
 ---
 
 ## 开发准备
 
 ### 1. SDK导入
+ 
+#### cocoapod集成(preferred)
 
-- #### 手动导入
+  有料SDK支持cocoapod集成，只需要添加相应的pod就行
+
+  1. 首先编辑Podfile, 如果没有先在工程目录下运行`pod init`
+
+  ```ruby
+  #Podfile
+  platform :ios, '9.0'
+  #添加有料源
+  source 'https://github.com/CocoaPods/Specs.git'
+  source 'https://github.com/NetEaseYouliao/Specs.git'
+
+  ...
+    
+  target :your_project_target do
+    pod 'NewsFeedsSDK'
+    pod 'NewsFeedsUISDK'
+    ...  #any other pod your project needed
+  end
+  ```
+
+  2. 运行`pod install`
+
+  ​
+
+#### 手动导入
 
 网易有料NewsFeedsSDK、NewsFeedsUISDK 可通过手动下载，并添加到项目中集成使用。
 
@@ -95,34 +123,10 @@ NewsFeedsUISDK提供的功能如下：
 
     若原工程中已包含，可以跳过。
 
-    注意 ：保证 SDWebImagede的版本大于 4.0
+    注意 ：**保证 SDWebImagede的版本大于 4.0**
 
     若在CocoaPods导入过程中，出现错误，用户可以将相关的第三方库源码导入工程即可。
 
-- #### cocoapod集成
-
-  现在有料SDK支持cocoapod集成，只需要添加相应的pod就行
-
-  1. 首先编辑Podfile, 如果没有先在工程目录下运行`pod init`
-
-  ```ruby
-  #Podfile
-  platform :ios, '9.0'
-  #添加有料源
-  source 'https://github.com/NetEaseYouliao/Specs.git'
-
-  ...
-    
-  target :your_project_target do
-    pod 'NewsFeedsSDK'
-    pod 'NewsFeedsUISDK'
-    ...  #any other pod your project needed
-  end
-  ```
-
-  2. 运行`pod install`
-
-  ​
 
   当SDK导入工程后，需要修改一些配置
 
@@ -249,6 +253,7 @@ NSString *version = [NewsFeedsUISDK version];
  *
  *  @param navController    页面跳转需要的UINavigationController实例
  *  @param delegate         NFeedsViewDelegate回调
+ *  @param configuration    提供配置的选项
  *  @param extraData        用户可以传入自定义字段，该字段会在回调中返回给用户
  *
  *  @discussion
@@ -257,6 +262,7 @@ NSString *version = [NewsFeedsUISDK version];
  */
 + (NFeedsView *)createFeedsView:(UINavigationController *)navController
                        delegate:(id<NFeedsViewDelegate>)delegate
+                         config:(NSDictionary * __nullable)configuration
                       extraData:(id)extraData;
 ```
 
@@ -266,7 +272,7 @@ NSString *version = [NewsFeedsUISDK version];
 
     ```objc
     //接入信息流UI SDK，快速集成信息流主页 NFeedsView
-    NFeedsView *feedsView = [NewsFeedsUISDK createFeedsView:self.navigationController delegate:self extraData:@"whole"];
+    NFeedsView *feedsView = [NewsFeedsUISDK createFeedsView:self.navigationController delegate:self config:nil extraData:@"seperate"];
     feedsView.frame = CGRectMake(0, 20 + 44, self.view.bounds.size.width, self.view.bounds.size.height - 64);
     [self.view addSubview:feedsView];
     ```
@@ -368,10 +374,12 @@ NFeedsViewDelegate为NFeedsView类对应的回调，提供信息流主页交互�
  *
  *  @param newsInfo    待加载新闻详情的newsInfo
  *  @param delegate    NFArticleDetailViewDelegate回调
- *  @param extraData   用户可以传入自定义字段，该字段会在回调中返回给用户
+ *  @param configuration  提供配置的选项
+ *  @param extraData        用户可以传入自定义字段，该字段会在回调中返回给用户
  */
 + (NFArticleDetailView *)createArticleDetailView:(NFNewsInfo *)newsInfo
                                         delegate:(id<NFArticleDetailViewDelegate>)delegate
+                                          config:(NSDictionary * __nullable)configuration
                                        extraData:(id)extraData;
 ```
 用户选择自己创建新闻详情页面时，可以通过该接口创建新闻详情视图实例，其中newsInfo为待加载新闻详情的newsInfo，delegate为 NFArticleDetailViewDelegate回调，extraData为用户可以自定义传入的字段。
@@ -382,7 +390,7 @@ NFeedsViewDelegate为NFeedsView类对应的回调，提供信息流主页交互�
 
 ```objc
 // 第一步：接入信息流UI SDK，自定义集成文章类展示页NFArticleDetailView
-NFArticleDetailView *articledetailView = [NewsFeedsUISDK createArticleDetailView:_newsInfo delegate:self extraData:@"articledetailView"];
+NFArticleDetailView *articledetailView = [NewsFeedsUISDK createArticleDetailView:_newsInfo delegate:self config:nil extraData:@"articledetailView"];
 [self.view addSubview:articledetailView];
 ```
 注意：实现delegate回调
@@ -451,6 +459,7 @@ NFArticleDetailView *articledetailView = [NewsFeedsUISDK createArticleDetailView
 #### 文章类新闻展示页回调接口说明(NFArticleDetailViewDelegate)
 
 - 相关推荐新闻的点击回调
+
 ```objc
 /**
  *  @method
@@ -471,6 +480,7 @@ NFArticleDetailView *articledetailView = [NewsFeedsUISDK createArticleDetailView
 ---
 
 - 新闻正文中图片点击
+
 ```objc
 /**
  *  @method
@@ -495,6 +505,7 @@ NFArticleDetailView *articledetailView = [NewsFeedsUISDK createArticleDetailView
 ---
 
 -  文章新闻详情加载成功
+
 ```objc
 /**
  *  @method
@@ -514,9 +525,28 @@ NFArticleDetailView *articledetailView = [NewsFeedsUISDK createArticleDetailView
 ```
 该回调主要方便用户在新闻加载成功时，调用NewsFeedsSDK的markRead接口将新闻标记为已读，同时刷新列表已读状态
 
+示例代码：
+
+```objc
+- (void)articleDidLoadContent:(NFArticleDetailView *)detailView extraData:(id)extraData {
+    __weak typeof(self)weakSelf = self;
+
+	// 标记为已读
+    [[NewsFeedsSDK sharedInstance] hasRead:self.newsInfo.infoId block:^(BOOL hasRead) {
+        if (!hasRead) {
+            [[NewsFeedsSDK sharedInstance] markRead:weakSelf.newsInfo.infoId];
+            if ([weakSelf.delegate respondsToSelector:@selector(articleDetailNewsMarkRead)]) {
+                [weakSelf.delegate articleDetailNewsMarkRead];
+            }
+        }
+    }];
+}
+```
+
 ---
 
 - 详情页面跳转到报错页面的回调
+
 ```objc
 /**
  *  @method
@@ -537,6 +567,7 @@ NFArticleDetailView *articledetailView = [NewsFeedsUISDK createArticleDetailView
 ---
 
 - 详情页面跳转到报错完成返回到主页的回调
+
 ```objc
 /**
  *  @method
@@ -555,6 +586,7 @@ NFArticleDetailView *articledetailView = [NewsFeedsUISDK createArticleDetailView
 ---
 
 - 详情页面点击分享的回调
+
 ```objc
 /**
  *  @method
@@ -578,6 +610,7 @@ NFArticleDetailView *articledetailView = [NewsFeedsUISDK createArticleDetailView
 
 
 #### 5、创建图集类新闻展示页NFPicSetGalleryViewController实例
+
 ```objc
 /**
  *  @method
@@ -634,6 +667,7 @@ NFPicSetGalleryViewController *browserVC = [NewsFeedsUISDK createPicSetGalleryVi
 NFPicSetGalleryDelegate提供图集类新闻展示页交互事件回调，目前支持的交互事件回调有：图集加载成功时的回调、左上角返回按钮的点击响应。
 
 - 图集加载成功时的回调
+
 ```objc
 /**
  *  @method
@@ -655,6 +689,7 @@ NFPicSetGalleryDelegate提供图集类新闻展示页交互事件回调，目前
 ---
 
 - 图集页面点击分享的回调
+
 ```objc
 /**
  *  @method
@@ -678,6 +713,7 @@ NFPicSetGalleryDelegate提供图集类新闻展示页交互事件回调，目前
 ---
 
 - 页面的返回回调
+
 ```objc
 /**
  *  @method
@@ -699,6 +735,7 @@ NFPicSetGalleryDelegate提供图集类新闻展示页交互事件回调，目前
 ---
 
 #### 6、创建视频类新闻展示页NFVideoBrowserViewController实例
+
 ```objc
 /**
  *  @method
@@ -754,6 +791,7 @@ NFPicSetGalleryDelegate提供图集类新闻展示页交互事件回调，目前
 NFVideoBrowserDelegate提供视频类新闻展示页交互事件回调，目前支持的交互事件回调有：视频加载成功时的回调、左上角返回按钮的点击响应。
 
 - 视频加载成功时的回调
+
 ```objc
 /**
  *  @method
@@ -773,6 +811,7 @@ NFVideoBrowserDelegate提供视频类新闻展示页交互事件回调，目前�
 该回调主要方便用户在新闻加载成功时刷新列表已读状态
 
 - 视频页面点击分享的回调
+
 ```objc
 /**
  *  @method
@@ -796,6 +835,7 @@ NFVideoBrowserDelegate提供视频类新闻展示页交互事件回调，目前�
 ---
 
 - 页面的返回回调
+
 ```objc
 /**
  *  @method
@@ -817,6 +857,7 @@ NFVideoBrowserDelegate提供视频类新闻展示页交互事件回调，目前�
 
 
 #### 7、创建文章类新闻正文图片集展示页NFArticleGalleryViewController实例
+
 ```objective-c
 /**
  *  @method
@@ -860,7 +901,8 @@ NFArticleGalleryViewController *browserVC = [NewsFeedsUISDK createArticleGallery
 #### 文章类新闻正文图片集展示页回调接口说明(NFArticleGalleryDelegate)
 
 - 页面的返回回调
-```objc
+
+	```objc
 /**
  *  @method
  *
@@ -888,7 +930,7 @@ NFArticleGalleryViewController *browserVC = [NewsFeedsUISDK createArticleGallery
 
 * 标题滚动类入口
 
-  [[/images/titleboard_entrance.png|alt=标题滚动类入口示意图]]
+  ![](http://ojwwhf19y.bkt.clouddn.com/test04.jpeg)
 
 * 后续添加更多入口...
 

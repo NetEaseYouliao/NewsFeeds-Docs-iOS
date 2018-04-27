@@ -5,7 +5,6 @@
 SDK通过Web方式接入网易有料内容，并使用jsbridge使native能够完成如微信分享等功能。
 
 
-
 ## 开发准备
 
 1. #### SDK导入
@@ -27,7 +26,8 @@ SDK通过Web方式接入网易有料内容，并使用jsbridge使native能够完
         #Podfile
         platform :ios, '9.0'
         #添加有料源
-        source 'https://github.com/NetEaseYouliao/Specs.git'
+        source 'https://github.com/CocoaPods/Specs.git'
+source 'https://github.com/NetEaseYouliao/Specs.git'
 
         ...
           
@@ -51,72 +51,85 @@ SDK通过Web方式接入网易有料内容，并使用jsbridge使native能够完
 
 2. #### SDK使用
 
-首先调用NewsFeedsHybridSDK初始化
+##### 2.1 配置NewsFeedsHybridSDK相关参数
 
-```objective-c
-[[NewsFeedsHybridSDK sharedSDK] startWithAppKey:@"appKey" appSecret:@"appSecret"];
+首先在合适的地方调用NewsFeedsHybridSDK中的配置方法进行SDK相关参数的配置，推荐在
+AppDelegate的`application:didFinishLaunchingWithOptions:`中进行配置。
+
+```objc
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+	
+	...
+	
+	// 配置appKey和appSecret
+	[[NewsFeedsHybridSDK sharedSDK] startWithAppKey:@"您的的appKey" appSecret:@"您的appSecret"];
+
+	...
+	return YES;
+}
 ```
 
-获取SDK主入口
+##### 2.2 获取SDK主入口
 
-```objective-c
- NFHybridContainerController*_hybridContainerController = [[NewsFeedsHybridSDK sharedSDK] instantiateInitialContainer];
-_hybridContainerController.delegate = SomeOtherClass<NFHybridDelegate> instance;  
-```
-
-用户接入可以有两种选择，推荐放入UINavigationController的栈中。
+NewsFeedsHybridSDK中提供的`instantiateInitialContainer`方法为信息流主入口方法，用于展示信息流列表页面。
+用户接入可以有两种选择:直接作为独立的controller、嵌入用户自定义的controller中。推荐放入UINavigationController的栈中。
 
 1. 直接作为独立的controller
 
-   ```objective-c
-   [[UINavigationController alloc] initWithRootViewController:_hybridContainerController];
-   ```
+```objc
+ // 初始化
+ NFHybridContainerController *hybridContainerController = [[NewsFeedsHybridSDK sharedSDK] instantiateInitialContainer];
+ hybridContainerController.delegate = SomeOtherClass<NFHybridDelegate> instance; 
+  
+ [self.navigationController pushViewController:hybridContainerController animated:YES];
+ 
+```
 
-   ​
+2. 嵌入用户自定义的controller中
 
-2. 嵌入用户自定义的controller
-
-   ```objective-c
-   - (void)viewDidLoad {
+```objc
+- (void)viewDidLoad {
+   		 
    	...
-   	[self.view addSubview:_hybridContainerController.view];
-       [self addChildViewController:_hybridContainerController];
-   }
-   ```
+   		 
+   	// 初始化
+   	NFHybridContainerController *hybridContainerController = [[NewsFeedsHybridSDK sharedSDK] instantiateInitialContainer];
+   	hybridContainerController.delegate = SomeOtherClass<NFHybridDelegate> instance;
+   		
+   	// 嵌入用户自定义的controller中
+   	[self.view addSubview:hybridContainerController.view];
+    [self addChildViewController:hybridContainerController];
+}
+```
+   
+##### 2.3 实现NFHybridDelegate，完成web和native的通信
+实现NFHybridDelegate，完成web和native的通信。当前HybridSDK支持四种事件，分别是init, openLink, openLinkByParam, share。
 
-实现NFHybridDelegate，完成web和native的通信。当前HybridSDK支持三种事件，分别是`init`, `openLink`, `openLinkByParam`,`share`
+
 
 * init 
 
   init是web页面加载时发起的事件，需要用户返回`appKey`， `secretKey`，`supportActions`，`supportSharePlatforms`。
+    
+	参数  | 描述
+	------------- | -------------
+	appKey		    | 用户appKey
+	secretKey     | 用户secretKey
+	supportActions| 当前native支持的事件名，目前只支持`share`事件。因为web端的更新会超前于native，所以web会隐藏native不支持的action。
+1. 1. 1. 1. 	supportSharePlatforms|当前native支持的分享平台，目前只支持微信和朋友圈，其中0表示微信分享用户，1表示微信朋友圈。native需要自行判断微信的安装情况来返回参数。暂不支持其它平台。
 
-  其中`supportActions`返回当前native支持的事件名，因为web端的更新会超前于native，所以web会隐藏native不支持的action。
-
-  `supportSharePlatforms`返回当前native支持的分享平台，其中0表示微信分享用户，1表示微信朋友圈。native需要自行判断微信的安装情况来返回参数。暂不支持其它平台。
-
-* openLink
-
-  当打开新闻详情时，会发起`openLink`事件，同时携带`url`参数。该事件不关心返回结果。
-* openLinkByParam
-
-  `openLinkByParam`和`openLink`的作用是一样的，区别在于`openLinkByParam`事件并非携带完整的`url`参数，而是一些结构化的数据，数据字段在`NFHybridNewsInfo`中有详细说明，用户将这些数据拼接成一个完整的`url`实现跳转。可参考示例代码。
-
-* share
-
-  当用户点击分享时，会发起该事件。事件参数是`platform`，`link`，`imgUrl`，`title`，`desc`。`platform`和`supportSharePlatforms`相同。该事件不关心返回结果。
-
-  示例代码如下：
-
-```objective-c
-- (BOOL)webViewContainer:(NFHybridContainerController *)container receiveEvent:(NSString *)event params:(NSDictionary *)params completion:(NFHybridSDKCallback)completion {
-
+ 
+```objc
+- (BOOL)webViewContainer:(NFHybridContainerController *_Nonnull)container receiveEvent:(NSString *_Nonnull)event params:(NSDictionary *_Nullable)params completion:(NFHybridSDKCallback _Nullable )completion{
+    
     if ([event isEqualToString:@"init"]) {
-        if (completion) {
+        if (completion &&
+            [NewsFeedsHybridSDK sharedSDK].appKey.length > 0 &&
+            [NewsFeedsHybridSDK sharedSDK].appSecret.length > 0)
+        {
             NSMutableArray *platform = [@[] mutableCopy];
-            if ([WXApi isWXAppInstalled]) {
                 [platform addObject:@(0)];
                 [platform addObject:@(1)];
-            }
             completion(@{
                          @"appKey": [NewsFeedsHybridSDK sharedSDK].appKey,
                          @"secretKey": [NewsFeedsHybridSDK sharedSDK].appSecret,
@@ -126,18 +139,61 @@ _hybridContainerController.delegate = SomeOtherClass<NFHybridDelegate> instance;
                        , nil);
         }
         return YES;
-    } else if ([event isEqualToString:@"openLink"]) {
+    }
+  return NO;
+} 
+```
+
+* openLink
+
+  当打开新闻详情时，会发起`openLink`事件，同时携带`url`参数。该事件不关心返回结果。
+  用户可通过该事件拿到`url`参数初始化新闻详情页。
+
+```objc
+- (BOOL)webViewContainer:(NFHybridContainerController *)container receiveEvent:(NSString *)event params:(NSDictionary *)params completion:(NFHybridSDKCallback)completion {
+    
+    if ([event isEqualToString:@"openLink"]) {
+        
+        // 获取url参数
         NSString *url = params[@"url"];
-        NSString *type = params[@"type"];
-        if ([type isEqualToString:@"ad"]) {
-            [self openADBySafariWithURL:url];
-        } else {
-            [self routeToDetailWithURL:url withSource:@""];
-        }
+        
+        // 初始化详情页
+        NFHybridContainerController * detailVC = [[NewsFeedsHybridSDK sharedSDK] instantiateContainerWithURL:[NSURL URLWithString:url]];
+        
+        // 跳转到详情页
+        ...
         
         return YES;
-        
-    }else if ([event isEqualToString:@"openLinkByParam"]){ // 结构化数据拼接成URL
+    }
+    return NO;
+}
+```
+  
+* openLinkByParam
+
+  `openLinkByParam`和`openLink`的作用是一样的，区别在于`openLinkByParam`事件并非携带完整的`url`参数，而是一些结构化的数据，数据字段在`NFHybridNewsInfo`中有详细说明，用户只需调用`instantiateContainerWithNewsInfo:newsInfo`方传入获取到的`NFHybridNewsInfo`字段即可初始化新闻详情页面。该事件不关心返回结果。
+  
+  字段 | 说明
+  ----------- | --------
+  ak |  应用的 appKey。Hybrid 必须在 init 方法中传递
+  sk | 应用的 secretKey。Hybrid 必须在 init 方法中传递
+  ctag|   频道 tag值 
+  dt | 新闻标题
+  newsID | 新闻ID
+  info | 推荐策略及权重信息，上传用户行为时需携带，producer为recommendation时才有值
+  it | 新闻类型，article：文章，picset：图集，video：视频，ad：表示广告
+  p | 新闻生产者，user：用户，recommendation：推荐系统
+  rid | 推荐唯一标识，上报用户行为时需要携带, producer为recommendation时才有值
+  st | 新闻来源
+  unid | 用户唯一标识。支持 userId、deviceId 和 cookie
+  cid | 频道ID
+  
+  示例代码：
+  
+```objc
+ - (BOOL)webViewContainer:(NFHybridContainerController *_Nonnull)container receiveEvent:(NSString *_Nonnull)event params:(NSDictionary *_Nullable)params completion:(NFHybridSDKCallback _Nullable )completion{
+  
+  if ([event isEqualToString:@"openLinkByParam"]){
         
         NFHybridNewsInfo * newsInfo = [[NFHybridNewsInfo alloc]init];
         newsInfo.ak = params[@"search"][@"ak"];
@@ -153,88 +209,64 @@ _hybridContainerController.delegate = SomeOtherClass<NFHybridDelegate> instance;
         newsInfo.unid = params[@"search"][@"unid"];
         newsInfo.cid = params[@"search"][@"cid"];
         
-        // 环境判断
-        NSDictionary* infoDict = [[NSBundle mainBundle] infoDictionary];
-        NSString *env = [infoDict objectForKey:@"HostEnvironment"];
-        NSString *url;
-        if ([env isEqualToString:@"qa"]) {
-            url = @"http://youliao-qa.163yun.com/h5/detail/?s=seve";
-        } else if([env isEqualToString:@"dev"]) {
-            url = @"http://testyouliao.163yun.com/h5/detail/?s=seve";
-        } else {
-            url = @"http://youliao.163yun.com/h5/detail/?s=seve";
-        }
+        // 初始化详情页
+        NFHybridContainerController * detailVC = [[NewsFeedsHybridSDK sharedSDK] instantiateContainerWithNewsInfo:newsInfo];
+        detailVC.navTitle = newsInfo.st;
         
-        NSString * urlStr = [NSString stringWithFormat:@"%@&ak=%@&ctag=%@&dt=%@&id=%@&info=%@&it=%@&p=%@&rid=%@&sk=%@&st=%@&unid=%@&cid=%@",
-                             url,
-                             newsInfo.ak,
-                             newsInfo.ctag,
-                             newsInfo.dt,
-                             newsInfo.newsID,
-                             newsInfo.info,
-                             newsInfo.it,
-                             newsInfo.p,
-                             newsInfo.rid,
-                             newsInfo.sk,
-                             newsInfo.st,
-                             newsInfo.unid,
-                             newsInfo.cid];
-        
-         [self routeToDetailWithURL:[urlStr stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] withSource:[newsInfo.st stringByRemovingPercentEncoding]];
-        
-        
-    }else if ([event isEqualToString:@"share"])  {
-        NSString *imageURLString = params[@"imgUrl"];
-        NSMutableString *originLink = [params[@"link"] mutableCopy];
-        NSURLComponents *c = [NSURLComponents componentsWithString:originLink];
-        NSMutableArray *queryItems = [[c queryItems] mutableCopy];
-        NSString *infoType;
-        NSString *infoId;
-        NSString *producer;
-        
-        for (NSURLQueryItem *item in queryItems) {
-            if ([item.name isEqualToString:@"id"]) {
-                infoId = item.value;
-            } else if ([item.name isEqualToString:@"it"]) {
-                infoType = item.value;
-            } else if ([item.name isEqualToString:@"p"]) {
-                producer = item.value;
-            }
-        }
-        
-        [originLink appendString:@"&fss=1"];
-        [originLink appendFormat:@"&ak=%@", [self encodeParameter:[NewsFeedsHybridSDK sharedSDK].appKey]];
-        [originLink appendFormat:@"&sk=%@", [self encodeParameter:[NewsFeedsHybridSDK sharedSDK].appSecret]];
-        [originLink appendFormat:@"&iou=%@", [self encodeParameter:[NSString stringWithFormat:@"youliao://youliao.163yun.com?infoId=%@&infoType=%@&producer=%@", infoId, infoType, producer]]];
-        [originLink appendFormat:@"&aou=%@", [self encodeParameter:[NSString stringWithFormat:@"youliao://youliao.163yun.com?infoId=%@&infoType=%@&producer=%@", infoId, infoType, producer]]];
-        
-        if (imageURLString.length > 4) {
-            [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:[NSURL URLWithString:imageURLString] options:0 progress:nil completed:^(UIImage * image, NSData * data, NSError * error, BOOL finished) {
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [WXApiRequestHandler sendLinkURL:originLink
-                                             TagName:@"share"
-                                               Title:params[@"title"]
-                                         Description:params[@"desc"] ? : @""
-                                          ThumbImage:[UIImage thumbnailForImageOfData:data maxSidePixels:100]
-                                             InScene:[params[@"platform"] intValue]];
-                });
-                
-                
-            }];
-        } else {
-            [WXApiRequestHandler sendLinkURL:originLink
-                                     TagName:@"share"
-                                       Title:params[@"title"]
-                                 Description:params[@"desc"]
-                                  ThumbImage:nil
-                                     InScene:[params[@"platform"] intValue]];
-        }
+       	// 跳转到详情页
+       	...
         
         return YES;
-    }
-    return NO;
+        }
+      return NO;
 }
 ```
 
-以上delegate的返回值，表示native有没有响应此事件。如果响应请返回YES，否则返回NO。sdk将根据函数返回值判断是否执行默认操作。
+* share
+
+  当用户点击分享时，会发起该事件。事件参数是`platform`，`link`，`imgUrl`，`title`，`desc`。`platform`和`supportSharePlatforms`相同。该事件不关心返回结果。
+  
+  字段 | 描述
+  ----- | ----
+  platform | 分享平台 ，同`init`事件中的`supportSharePlatforms` 
+  link | 分享链接
+  imgUrl | 分享图标链接
+   title | 分享标题
+   desc  | 分享描述
+
+
+
+#### 3. 自定义导航栏´
+
+SDK中提供了自定义导航栏的接口，若用户需要使用自定义导航栏，需设置`NFHybridContainerCustomNavigationBarDelegate`，并传当前的控制器。
+
+```objc
+   NFHybridContainerController * detailVC = [[NewsFeedsHybridSDK sharedSDK] instantiateContainerWithNewsInfo:newsInfo]; 
+   detailVC.customNavigationBarDelegate = self;
+   detailVC.parentVC = self.hybridContainerController; // 传入当前VC，用于隐藏NavigationBar以及pop到上一页面
+   detailVC.navTitle = newsInfo.st; // 导航栏标题 
+   [self.navigationController pushViewController:detailVC animated:YES];
+```
+
+`NFHybridContainerCustomNavigationBarDelegate`提供的接口方便用户自定义实现相关推荐的返回操作。如：在相关推荐中默认返回到信息流列表页，用户可通过代理方法拦截返回实现只返回到上一级页面，若用户不使用自定义导航栏，可获取到`webView`自行实现。
+
+```objc
+- (void)hybridContainerCustomNavLeftItemClicked {
+    if ([self.detailVC.webView canGoBack]) {
+        [self.detailVC.webView goBack];
+    } else {
+        if (self.navigationController.viewControllers.count > 1){
+            [self.navigationController popViewControllerAnimated:YES];
+            return;
+        }
+        
+        if (self.presentingViewController){
+            [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
+                
+            }];
+            return;
+        }
+    }
+}
+```
+´
