@@ -116,7 +116,7 @@ NewsFeedsHybridSDK中提供的`instantiateInitialContainer`方法为信息流主
 	appKey		    | 用户appKey
 	secretKey     | 用户secretKey
 	supportActions| 当前native支持的事件名，目前只支持`share`事件。因为web端的更新会超前于native，所以web会隐藏native不支持的action。
-1. 1. 1. 1. 	supportSharePlatforms|当前native支持的分享平台，目前只支持微信和朋友圈，其中0表示微信分享用户，1表示微信朋友圈。native需要自行判断微信的安装情况来返回参数。暂不支持其它平台。
+	supportSharePlatforms|当前native支持的分享平台，目前只支持微信和朋友圈，其中0表示微信分享用户，1表示微信朋友圈。native需要自行判断微信的安装情况来返回参数。暂不支持其它平台。
 
  
 ```objc
