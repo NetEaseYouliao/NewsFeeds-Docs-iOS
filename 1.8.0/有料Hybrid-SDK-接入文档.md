@@ -27,7 +27,7 @@ SDK通过Web方式接入网易有料内容，并使用jsbridge使native能够完
         platform :ios, '9.0'
         #添加有料源
         source 'https://github.com/CocoaPods/Specs.git'
-source 'https://github.com/NetEaseYouliao/Specs.git'
+        source 'https://github.com/NetEaseYouliao/Specs.git'
 
         ...
           
