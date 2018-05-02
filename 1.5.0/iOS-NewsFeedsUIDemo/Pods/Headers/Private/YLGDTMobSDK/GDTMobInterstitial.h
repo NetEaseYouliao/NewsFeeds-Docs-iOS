@@ -1,1 +1,0 @@
-../../../YLGDTMobSDK/libGDTMobSDK/GDTMobInterstitial.h

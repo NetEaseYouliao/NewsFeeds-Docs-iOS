@@ -1,6 +1,0 @@
-framework module NewsFeedsUISDK {
-  umbrella header "NewsFeedsUISDK.h"
-
-  export *
-  module * { export * }
-}

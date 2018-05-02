@@ -1,6 +1,0 @@
-framework module NewsFeedsHybridSDK {
-  umbrella header "NewsFeedsHybridSDK.h"
-
-  export *
-  module * { export * }
-}
