@@ -16,7 +16,7 @@ NewsFeedsUISDK提供的功能如下：
 接入的模式有两种：
 
 - 快速集成信息流
-    > 信息流的基本功能包含信息流主页、文章类新闻展示页、图集类新闻展示页等，若用户选择快速集成方式，则使用UI SDK提供的所有默认页面。
+   > 信息流的基本功能包含信息流主页、文章类新闻展示页、图集类新闻展示页等，若用户选择快速集成方式，则使用UI SDK提供的所有默认页面。
     
 - 自定义集成信息流
    > 用户可以根据UI SDK提供的回调，自定义交互逻辑。例如，点击新闻列表后的目标调转页面、点击相关推荐后的目标调转页面等等。
@@ -35,7 +35,7 @@ NFArticleDetailView | 文章详情的视图和`NFArticleDetailViewDelegate`相�
 NFPicSetGalleryViewController | 图集页面和`NFPicSetGalleryDelegate`相关的回调接口
 NFVideoBrowserViewController | 视频浏览页面和`NFVideoBrowserDelegate`相关的回调接口
 NFArticleGalleryViewController  | 新闻详情的图片浏览页面和`NFArticleGalleryDelegate`相关的回调接口
-UIViewController<NFChannelControllerProtocol> | 信息流小入口和`NFChannelControllerDelegate`相关的回调接口
+UIViewController\<NFChannelControllerProtocol\> | 信息流小入口和`NFChannelControllerDelegate`相关的回调接口
 
 ---
 
@@ -51,7 +51,7 @@ UIViewController<NFChannelControllerProtocol> | 信息流小入口和`NFChannelC
 
   ```ruby
   #Podfile
-  platform :ios, '9.0'
+  platform :ios, '8.0'
   #添加有料源
   source 'https://github.com/CocoaPods/Specs.git'
   source 'https://github.com/NetEaseYouliao/Specs.git'
@@ -76,7 +76,6 @@ UIViewController<NFChannelControllerProtocol> | 信息流小入口和`NFChannelC
 1. 将下载得到的NewsFeedsSDK.framework手动导入到工程中。
 2. 将下载得到的NewsFeedsUISDK.framework和NFUIBundle.bundle手动导入到工程中。
 3. 下载广点通SDK，导入到工程中，下载链接为:[广点通SDK](https://github.com/NetEaseYouliao/YLGDTMobSDK)
-4. 若使用推送功能，下载个推SDK，导入到工程中，下载链接为:[个推SDK](http://docs.getui.com/download.html)
 
     将相关包拖进工程的时候，参考下图选项
 
@@ -86,11 +85,13 @@ UIViewController<NFChannelControllerProtocol> | 信息流小入口和`NFChannelC
 
     保证Build Phases -> Copy Bundle Resources中包含NFBundle.bundle和NFUIBundle.bundle
 
-5. 添加系统依赖库
+4. 添加系统依赖库
 
     -   libsqlite3.tbd
     -   libz.tbd
     -   libc++.tbd
+    -   libxml2.tbd
+    -   UIKit.framework
     -   AdSupport.framework
     -   CoreLocation.framework
     -   AVFoundation.framework
@@ -98,24 +99,27 @@ UIViewController<NFChannelControllerProtocol> | 信息流小入口和`NFChannelC
     -   MobileCoreServices.framework
     -   SystemConfiguration.framework
     -   CoreTelephony.framework
+    -   MediaPlayer.framework
+    -   CoreMedia.framework
     -   UserNotifications.framework
-    -   StoreKit.framework
-    -   SafariServices.framework
+    -   CoreFoundation.framework
 
-6. 在 Build Settings -> Other Linker Flags 里，添加选项 -ObjC。
+        <font color=red size=2 face="黑体">手动导入的时候系统库UserNotifications.framework和CoreFoundation.framework需要设置为Optional，如下图</font>
+    
+    ![image](http://odotlq87m.bkt.clouddn.com/WechatIMG13.jpeg)
+
+5. 在 Build Settings -> Other Linker Flags 里，添加选项 -ObjC。
 
 
-7. 使用NewsFeedsUISDK，需依赖的第三方库：
+6. 使用NewsFeedsUISDK，需依赖的第三方库：
 
-    -   UITableView+FDTemplateLayoutCell
     -   Masonry
     -   SDWebImage/WebP
     -   SDWebImage/GIF
 
     建议使用CocoaPods导入上述5个库
 
-    ```
-      pod 'UITableView+FDTemplateLayoutCell', '~> 1.4'
+    ```ruby
       pod 'Masonry'
       pod 'SDWebImage/WebP'
       pod 'SDWebImage/GIF'
@@ -129,20 +133,30 @@ UIViewController<NFChannelControllerProtocol> | 信息流小入口和`NFChannelC
 
 
   当SDK导入工程后，需要修改一些配置
+   
+### 2.注意项
 
-1. 配置App Transport Security
+1. 由于Appstore禁止不使用广告而采集IDFA的app上架，SDK中采集IDFA作为设备ID以达到更为精确的个性化推荐的结果。如果应用使用SDK而未集成任何广告服务，请按照以下填写Appstore中的IDFA选项：
+		
+	![image](http://images.9liuda.com/opensdk/web3.0/image/documentJoin/10.png)
+		
+	这里建议勾选图中所示的选项。
 
-   由于NewsFeedsSDK返回的video和image的url为http的方式，为了保证能够正常播放视频及加载图片，需在info.plist中配置App Transport Security Settings，并将Allow Arbitrary Loads设为YES，具体设置参考下图：
+2. 配置App Transport Security
 
-   ![image](http://ofwsr8cl0.bkt.clouddn.com/WechatIMG70.jpeg)
+    由于NewsFeedsSDK返回的video和image的url为http的方式，为了保证能够正常播放视频及加载图片，需在info.plist中配置App Transport Security Settings，并将Allow Arbitrary Loads设为YES，具体设置参考下图：
 
-2. 配置访问相册权限
+    ![image](http://ofwsr8cl0.bkt.clouddn.com/WechatIMG70.jpeg)
+
+    注意：若用户未进行该设置，为了保证图片正常展示以及视频的正常播放，需要调用setHttpsOn接口进行配置，该接口的具体使用参考下文
+    
+3. 配置访问相册权限
 
    由于图集和新闻正文详情图片浏览时，图片可以保存到本地相册，需开通访问相册权限
 
    info.plist中添加Privacy - Photo Library Usage Description和Privacy - Photo Library Additions Usage Description
 
-### 2. NewsFeedsUISDK初始化
+### 3. NewsFeedsUISDK初始化
 
 首先调用NewsFeedsUISDK初始化，否则后续UI功能无法使用，具体使用可参考demo
 
