@@ -23,7 +23,6 @@ NewsFeedsSDK提供的功能如下：
 - NFChannel频道列表的model类
 - NFNews新闻列表的model类
 - NFNewsDetail新闻详情的model类
-- GeTuiSdk个推SDK的入口类
 
 ---
 
@@ -40,11 +39,36 @@ NewsFeedsSDK提供的功能如下：
 
 ## 开发准备
 
+### 1. SDK导入
+ 
+#### CocoaPods导入
+
+  有料SDK支持cocoapod集成，只需要添加相应的pod就行
+
+  1. 首先编辑Podfile, 如果没有先在工程目录下运行`pod init`
+
+  ```ruby
+  #Podfile
+  platform :ios, '8.0'
+  
+  #添加有料源（需要官方源和有料源同时存在，如下）
+  source 'https://github.com/CocoaPods/Specs.git'
+  source 'https://github.com/NetEaseYouliao/Specs.git'
+    
+  target :your_project_target do
+    pod 'NewsFeedsSDK'
+    ...  #any other pod your project needed
+  end
+  ```
+
+  2. 运行`pod install`
+
+#### 手动导入
+
 网易有料NewsFeedsSDK 可通过手动下载，并添加到项目中集成使用。
 
-1. 将下载得到的NewsFeedsSDK.framework和NFBundle.bundle导入到工程中。
+1. 将下载得到的NewsFeedsSDK.framework导入到工程中。
 2. 下载广点通SDK，导入到工程中，下载链接为:[广点通SDK](https://github.com/NetEaseYouliao/YLGDTMobSDK)
-3. 若使用推送功能，下载个推SDK，导入到工程中，下载链接为:[个推SDK](http://docs.getui.com/download.html)
 
     将相关包拖进工程的时候，参考下图选项
 
@@ -54,34 +78,44 @@ NewsFeedsSDK提供的功能如下：
 
     保证Build Phases -> Copy Bundle Resources中包含NFBundle.bundle
 
-4. 添加其他的依赖库
+3. 添加系统依赖库
 
     -   AdSupport.framework
     -   CoreLocation.framework
-    -   UserNotifications.framework
-    -   libsqlite3.tbd
-    -   libz.tbd
     -   MobileCoreServices.framework
     -   StoreKit.framework
     -   SafariServices.framework
+    -   SystemConfiguration.framework
+    -   CoreTelephony.framework
+    -   UserNotifications.framework
+    -   CoreFoundation.framework
+    -   libsqlite3.tbd
+    -   libz.tbd
+    -   libxml2.tbd
 
-5. 在 Build Settings -> Other Linker Flags 里，添加选项 -ObjC。
+    <font color=red size=2 face="黑体">手动导入的时候系统库UserNotifications.framework和CoreFoundation.framework需要设置为Optional，如下图</font>
+    
+    ![image](http://odotlq87m.bkt.clouddn.com/WechatIMG13.jpeg)
 
-6. 由于Appstore禁止不使用广告而采集IDFA的app上架，SDK中采集IDFA作为设备ID以达到更为精确的个性化推荐的结果。如果应用使用SDK而未集成任何广告服务，请按照以下填写Appstore中的IDFA选项：
+4. 在 Build Settings -> Other Linker Flags 里，添加选项 -ObjC。
+
+---
+
+### 2.注意项
+
+1. 由于Appstore禁止不使用广告而采集IDFA的app上架，SDK中采集IDFA作为设备ID以达到更为精确的个性化推荐的结果。如果应用使用SDK而未集成任何广告服务，请按照以下填写Appstore中的IDFA选项：
 
 ![image](http://images.9liuda.com/opensdk/web3.0/image/documentJoin/10.png)
 
 这里建议勾选图中所示的选项。
 
-7. 配置App Transport Security
+2. 配置App Transport Security
 
     由于NewsFeedsSDK返回的video和image的url为http的方式，为了保证能够正常播放视频及加载图片，需在info.plist中配置App Transport Security Settings，并将Allow Arbitrary Loads设为YES，具体设置参考下图：
 
     ![image](http://ofwsr8cl0.bkt.clouddn.com/WechatIMG70.jpeg)
 
     注意：若用户未进行该设置，为了保证图片正常展示以及视频的正常播放，需要调用setHttpsOn接口进行配置，该接口的具体使用参考下文
-
----
 
 ## 初始化SDK
 
@@ -275,13 +309,14 @@ error为nil，channelList为网络返回数据，回调中channelList的类型�
 
 其中，单个频道NFChannelInfo的字段说明如下：
 
-| 名称          | 类型        | 示例   | 描述                                       |
+| 名称         | 类型        | 示例   | 描述                                       |
 | ----------- | --------- | ---- | ---------------------------------------- |
 | channelId   | NSString  |      | 频道ID                                     |
-| channelName | NSString  |      | 频道名称                                     |
-| order       | NSInteger | 1    | 频道显示的顺序                                  |
-| channelType | NSInteger |      | 频道类型，0：按类别聚合   1：按话题聚合   2：按自定义来源聚合    3：地域频道   4：自营频道 |
 | channelTag  | NSString  |      | 频道Tag，tag是获取feeds流的标识符，取代channelId       |
+| channelName | NSString  |      | 频道名称                                     |
+| channelOrder| NSInteger | 1    | 频道显示的顺序                                  |
+| channelType | NSInteger |      | 频道类型，0：按类别聚合   1：按话题聚合   2：按自定义来源聚合    3：地域频道   4：自营频道 |
+| bannerType | NSInteger |      | banner展现类型，0：自动轮播图和轮播图置顶均关闭，1：自动轮播图，2：轮播图置顶 |
 
 b.网络请求失败
 
@@ -1089,7 +1124,7 @@ float cacheSize = [[NewsFeedsSDK sharedInstance] cacheSize];
 ```
 
 - 示例
-- ​
+
 ```objc
 [[NFTracker sharedTracker] trackBrowseBegin:self.news];
 ```
@@ -1101,7 +1136,7 @@ float cacheSize = [[NewsFeedsSDK sharedInstance] cacheSize];
 当文章或图集浏览结束，视频播放暂停或结束时，建议调用该接口进行浏览行为上报。用户可以自主统计浏览时长和浏览进度一并上报。
 
 - 定义
-- ​
+
 ```objc
 /**
  *  @method
@@ -1118,7 +1153,7 @@ float cacheSize = [[NewsFeedsSDK sharedInstance] cacheSize];
 - (void)trackBrowseEnd:(NFNewsInfo *)newsInfo progress:(double)progress;
 ```
 - 示例
-- ​
+
 ```objc
 [[NFTracker sharedTracker] trackBrowseEnd:self.newsInfo progress:progress];
 ```
@@ -1335,13 +1370,14 @@ v1.5.0新增报错接口，定义：
 
 - 单个频道：NFChannelInfo
 
-| 名称          | 类型        | 示例   | 描述                                       |
+| 名称         | 类型        | 示例   | 描述                                       |
 | ----------- | --------- | ---- | ---------------------------------------- |
 | channelId   | NSString  |      | 频道ID                                     |
 | channelTag  | NSString  |      | 频道Tag，tag是获取feeds流的标识符，取代channelId       |
 | channelName | NSString  |      | 频道名称                                     |
-| order       | NSInteger | 1    | 频道显示的顺序                                  |
+| channelOrder| NSInteger | 1    | 频道显示的顺序                                  |
 | channelType | NSInteger |      | 频道类型，0：按类别聚合   1：按话题聚合   2：按自定义来源聚合    3：地域频道   4：自营频道 |
+| bannerType | NSInteger |      | banner展现类型，0：自动轮播图和轮播图置顶均关闭，1：自动轮播图，2：轮播图置顶 |
 
 - 新闻：NFNews
 
@@ -1350,6 +1386,8 @@ v1.5.0新增报错接口，定义：
 | infos   | NSArray(NFNewsInfo) | 普通新闻列表 |
 | banners | NSArray(NFNewsInfo) | 轮播列表   |
 | tops    | NSArray(NFNewsInfo) | 头条列表   |
+| channelType | NSInteger | 频道类型，0：按类别聚合   1：按话题聚合   2：按自定义来源聚合    3：地域频道   4：自营频道 |
+| bannerType | NSInteger | banner展现类型，0：自动轮播图和轮播图置顶均关闭，1：自动轮播图，2：轮播图置顶 |
 
 其中，NFNewsInfo为
 
@@ -1358,9 +1396,10 @@ v1.5.0新增报错接口，定义：
 | producer    | NSString              | 新闻提供者                             |
 | recId       | NSString              | 单次推荐唯一标示                          |
 | algInfo     | NSString              | 推荐策略及权重信息                         |
-| channelId   | NSString              | 频道ID                              |
+| channelTag  | NSString              | 频道Tag，tag是获取feeds流的标识符，取代channelId |
 | infoId      | NSString              | 新闻ID                              |
-| infoType    | NSString              | 新闻类型                              |
+| deliverId    | long              | 投递ID                              |
+| infoType    | NSString              | 新闻类型，文章/图集/视频/小视频  article/picset/video/svideo |
 | title       | NSString              | 新闻标题                              |
 | summary     | NSString              | 新闻简介                              |
 | source      | NSString              | 新闻来源                              |
@@ -1372,7 +1411,11 @@ v1.5.0新增报错接口，定义：
 | thumbnails  | NSArray (NFNewsImage) | 新闻缩略图                             |
 | tripleImgs  | NSArray (NFNewsImage) | 封面图三图                             |
 | videos      | NSArray (NFNewsVideo) | 视频源信息,只有在视频情况下才会返回该字段             |
+| feedbacks      | NSArray (NFFeedBackInfo) | 不感兴趣的分类             |
 | ad          | NFAdInfo              | 广告信息                              |
+| duration    | NSInteger             | 视频时长                              |
+| mark    | NSString             | 标识，例如热门/杭州...                              |
+
 
 其中，缩略图模型：NFNewsImage
 
@@ -1402,6 +1445,7 @@ v1.5.0新增报错接口，定义：
 
 | 名称               | 类型              | 描述                                |
 | ---------------- | --------------- | --------------------------------- |
+| adType           | NSInteger       | 广告位类型：0代表新闻列表  1代表轮播图  2代表新闻详情  3代表相关推荐 |
 | mediumId         | NSString        | 应用ID                              |
 | producer         | NSString        | 广告来源                              |
 | adPlacementId    | NSString        | 广告位                               |
