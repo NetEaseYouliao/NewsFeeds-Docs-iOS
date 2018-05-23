@@ -311,7 +311,7 @@ SDK中提供了自定义导航栏的接口，若用户需要使用自定义导�
 *  未实现该回调，则分享按钮隐藏
 */
 - (void)onShareClick:(NSDictionary *)shareInfo
-	type:(NSInteger)type;
+			type:(NSInteger)type;
 ```
 
 注意：
@@ -322,7 +322,7 @@ SDK中提供了自定义导航栏的接口，若用户需要使用自定义导�
 
 ```objc
 - (void)onShareClick:(NSDictionary *)shareInfo
-	type:(NSInteger)type 
+			type:(NSInteger)type 
 {
 	NSMutableString *url = [shareInfo[@"shareUrl"] mutableCopy];
 
