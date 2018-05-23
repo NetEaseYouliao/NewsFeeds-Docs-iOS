@@ -303,6 +303,7 @@ SDK中提供了自定义导航栏的接口，若用户需要使用自定义导�
 *  @abstract
 *  详情页面的分享按钮点击
 *
+*  @param hybridSDK  hybridSDK实例
 *  @param shareInfo  分享需要用到的字段集合
 *  @param type       分享类型，0：微信好友  1：朋友圈
 *
@@ -310,8 +311,9 @@ SDK中提供了自定义导航栏的接口，若用户需要使用自定义导�
 *  实现该回调，则分享按钮显示
 *  未实现该回调，则分享按钮隐藏
 */
-- (void)onShareClick:(NSDictionary *)shareInfo
-                type:(NSInteger)type;
+- (void)hybridSDK:(NewsFeedsHybridSDK *)hybridSDK
+     onShareClick:(NSDictionary *)shareInfo
+             type:(NSInteger)type;
 ```
 
 注意：
@@ -321,8 +323,9 @@ SDK中提供了自定义导航栏的接口，若用户需要使用自定义导�
 参考代码
 
 ```objc
-- (void)onShareClick:(NSDictionary *)shareInfo
-                type:(NSInteger)type 
+- (void)hybridSDK:(NewsFeedsHybridSDK *)hybridSDK
+     onShareClick:(NSDictionary *)shareInfo
+             type:(NSInteger)type 
 {
 	NSMutableString *url = [shareInfo[@"shareUrl"] mutableCopy];
 
