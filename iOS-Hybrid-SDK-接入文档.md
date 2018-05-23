@@ -120,8 +120,8 @@ NewsFeedsHybridSDK中提供的`instantiateInitialContainer`方法为信息流主
 	secretKey     | 用户secretKey
 	supportActions| 当前native支持的事件名。因为web端的更新会超前于native，所以web会隐藏native不支持的action。
 	supportSharePlatforms|当前native支持的分享平台，目前只支持微信和朋友圈，其中0表示微信分享用户，1表示微信朋友圈。native需要自行判断微信的安装情况来返回参数。暂不支持其它平台。
-       closePullRefresh        | 关闭下拉刷新，设置此配置项。默认开启
-       customNegativeFeedBack     | 使用自定义负反馈，设置此配置，实现对应negativeFeedBack事件。
+   closePullRefresh     | 关闭下拉刷新，设置此配置项。默认开启
+   customNegativeFeedBack | 使用自定义负反馈，设置此配置，实现对应negativeFeedBack事件。
 
  
 ```objc
@@ -311,7 +311,7 @@ SDK中提供了自定义导航栏的接口，若用户需要使用自定义导�
 *  未实现该回调，则分享按钮隐藏
 */
 - (void)onShareClick:(NSDictionary *)shareInfo
-				type:(NSInteger)type;
+	type:(NSInteger)type;
 ```
 
 注意：
@@ -322,7 +322,7 @@ SDK中提供了自定义导航栏的接口，若用户需要使用自定义导�
 
 ```objc
 - (void)onShareClick:(NSDictionary *)shareInfo
-				type:(NSInteger)type 
+	type:(NSInteger)type 
 {
 	NSMutableString *url = [shareInfo[@"shareUrl"] mutableCopy];
 
@@ -334,10 +334,10 @@ SDK中提供了自定义导航栏的接口，若用户需要使用自定义导�
 
 	//此处注意微信限制数据大小，超出则无法分享
 	[WXApiRequestHandler sendLinkURL:url
-							 TagName:shareInfo[@"infoType"]
-							   Title:shareInfo[@"title"]
-						 Description:shareInfo[@"summary"] ?  : shareInfo[@"source"]
-						  ThumbImage:shareInfo[@"thumbnail"]
-						     InScene:type];
+			   TagName:shareInfo[@"infoType"]
+			     Title:shareInfo[@"title"]
+		   Description:shareInfo[@"summary"] ?  : shareInfo[@"source"]
+			ThumbImage:shareInfo[@"thumbnail"]
+			   InScene:type];
 }
 ```
