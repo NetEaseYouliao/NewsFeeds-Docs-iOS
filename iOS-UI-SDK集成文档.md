@@ -1,6 +1,6 @@
 ## SDK概述
 
-网易有料NewsFeedsUISDK为移动应用提供内容智能分发功能，在NewsFeedsUISDK数据层SDK的基础上，方便第三方应用快速的集成并实现信息流各个页面的开发。SDK兼容iOS 9.0+。
+网易有料NewsFeedsUISDK为移动应用提供内容智能分发功能，在NewsFeedsUISDK数据层SDK的基础上，方便第三方应用快速的集成并实现信息流各个页面的开发。SDK兼容iOS 8.0+。
 
 在使用NewsFeedsUISDK的前提要同时导入NewsFeedsSDK。
 
