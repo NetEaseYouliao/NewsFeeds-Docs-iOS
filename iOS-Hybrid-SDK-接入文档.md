@@ -1,6 +1,6 @@
 ## SDK概述
 
-网易有料NewsFeedsHybridSDK是网易有料出品的一种轻量化解决方案。SDK兼容iOS 9.0+。
+网易有料NewsFeedsHybridSDK是网易有料出品的一种轻量化解决方案。SDK兼容iOS 8.0+。
 
 SDK通过Web方式接入网易有料内容，并使用jsbridge使native能够完成如微信分享等功能。
 
@@ -9,22 +9,13 @@ SDK通过Web方式接入网易有料内容，并使用jsbridge使native能够完
 
 1. #### SDK导入
 
-   * 手动集成
+   * cocoapod集成(推荐)
 
-     网易有料NewsFeedsHybridSDK 可通过手动下载，并添加到项目中集成使用。
-
-     1. 将下载得到的NewsFeedsHybridSDK.framework和NFHybridBundle.bundle手动导入到工程中。
-     2. 添加系统依赖库
-        * WebKit
-     3. 在 Build Settings -> Other Linker Flags 里，添加选项 -ObjC。
-
-   * cocoapod集成(preferred )
-
-     1. 首先编辑Podfile, 如果没有先在工程目录下运行`pod init`
+     1.首先编辑Podfile, 如果没有先在工程目录下运行`pod init`
 
         ```ruby
         #Podfile
-        platform :ios, '9.0'
+        platform :ios, '8.0'
         #添加有料源
         source 'https://github.com/CocoaPods/Specs.git'
         source 'https://github.com/NetEaseYouliao/Specs.git'
@@ -37,7 +28,19 @@ SDK通过Web方式接入网易有料内容，并使用jsbridge使native能够完
         end
         ```
 
-     2. 运行`pod install`
+  	  2.运行`pod install`
+     
+     
+    * 手动集成
+     
+     网易有料NewsFeedsHybridSDK 可通过手动下载，并添加到项目中集成使用。
+     
+		1. 将下载得到的NewsFeedsHybridSDK.framework和NFHybridBundle.bundle手动导入到工程中。
+		2. 下载NFUtilityFoundation，导入到工程中，下载链接为:[NFUtilityFoundation](https://github.com/NetEaseYouliao/NFUtilityFoundation)
+		3. 添加系统依赖库: WebKit，CoreFoundation
+					
+			<font color=red size=2 face="黑体">手动导入的时候系统库CoreFoundation.framework需要设置为Optional，如下图</font>![image](http://odotlq87m.bkt.clouddn.com/WechatIMG14.jpeg)
+		4. 在 Build Settings -> Other Linker Flags 里，添加选项 -ObjC。
 
      ​
 
@@ -103,7 +106,7 @@ NewsFeedsHybridSDK中提供的`instantiateInitialContainer`方法为信息流主
 ```
    
 ##### 2.3 实现NFHybridDelegate，完成web和native的通信
-实现NFHybridDelegate，完成web和native的通信。当前HybridSDK支持四种事件，分别是init, openLink, openLinkByParam, share。
+实现NFHybridDelegate，完成web和native的通信。当前HybridSDK支持四种事件，分别是init, openLink, openLinkByParam, negativeFeedBack。
 
 
 
@@ -115,8 +118,10 @@ NewsFeedsHybridSDK中提供的`instantiateInitialContainer`方法为信息流主
 	------------- | -------------
 	appKey		    | 用户appKey
 	secretKey     | 用户secretKey
-	supportActions| 当前native支持的事件名，目前只支持`share`事件。因为web端的更新会超前于native，所以web会隐藏native不支持的action。
+	supportActions| 当前native支持的事件名。因为web端的更新会超前于native，所以web会隐藏native不支持的action。
 	supportSharePlatforms|当前native支持的分享平台，目前只支持微信和朋友圈，其中0表示微信分享用户，1表示微信朋友圈。native需要自行判断微信的安装情况来返回参数。暂不支持其它平台。
+       closePullRefresh        | 关闭下拉刷新，设置此配置项。默认开启
+       customNegativeFeedBack     | 使用自定义负反馈，设置此配置，实现对应negativeFeedBack事件。
 
  
 ```objc
@@ -135,6 +140,11 @@ NewsFeedsHybridSDK中提供的`instantiateInitialContainer`方法为信息流主
                          @"secretKey": [NewsFeedsHybridSDK sharedSDK].appSecret,
                          @"supportActions": @[],
                          @"supportSharePlatforms": platform
+                         //关闭下拉刷新，设置此配置项
+                         //@"closePullRefresh": @(YES),
+                         //使用自定义负反馈，设置此配置，实现对应negativeFeedBack事件
+                         //@"customNegativeFeedBack": @(YES)
+
                          }
                        , nil);
         }
@@ -143,35 +153,11 @@ NewsFeedsHybridSDK中提供的`instantiateInitialContainer`方法为信息流主
   return NO;
 } 
 ```
-
-* openLink
-
-  当打开新闻详情时，会发起`openLink`事件，同时携带`url`参数。该事件不关心返回结果。
-  用户可通过该事件拿到`url`参数初始化新闻详情页。
-
-```objc
-- (BOOL)webViewContainer:(NFHybridContainerController *)container receiveEvent:(NSString *)event params:(NSDictionary *)params completion:(NFHybridSDKCallback)completion {
-    
-    if ([event isEqualToString:@"openLink"]) {
-        
-        // 获取url参数
-        NSString *url = params[@"url"];
-        
-        // 初始化详情页
-        NFHybridContainerController * detailVC = [[NewsFeedsHybridSDK sharedSDK] instantiateContainerWithURL:[NSURL URLWithString:url]];
-        
-        // 跳转到详情页
-        ...
-        
-        return YES;
-    }
-    return NO;
-}
-```
   
 * openLinkByParam
 
-  `openLinkByParam`和`openLink`的作用是一样的，区别在于`openLinkByParam`事件并非携带完整的`url`参数，而是一些结构化的数据，数据字段在`NFHybridNewsInfo`中有详细说明，用户只需调用`instantiateContainerWithNewsInfo:newsInfo`方传入获取到的`NFHybridNewsInfo`字段即可初始化新闻详情页面。该事件不关心返回结果。
+  当打开新闻详情时，会发起`openLink`事件，同时携带`url`参数
+  用户可通过该事件拿到`url`参数以及结构化的数据初始化新闻详情页。数据字段在`NFHybridNewsInfo`中有详细说明，用户只需调用`instantiateContainerWithNewsInfo:newsInfo`方传入获取到的`NFHybridNewsInfo`字段即可初始化新闻详情页面。该事件不关心返回结果。
   
   字段 | 说明
   ----------- | --------
@@ -195,19 +181,7 @@ NewsFeedsHybridSDK中提供的`instantiateInitialContainer`方法为信息流主
   
   if ([event isEqualToString:@"openLinkByParam"]){
         
-        NFHybridNewsInfo * newsInfo = [[NFHybridNewsInfo alloc]init];
-        newsInfo.ak = params[@"search"][@"ak"];
-        newsInfo.ctag = params[@"search"][@"ctag"];
-        newsInfo.dt = params[@"search"][@"dt"];
-        newsInfo.newsID = params[@"search"][@"id"];
-        newsInfo.info = params[@"search"][@"info"];
-        newsInfo.it = params[@"search"][@"it"];
-        newsInfo.p = params[@"search"][@"p"];
-        newsInfo.rid = params[@"search"][@"rid"];
-        newsInfo.sk = params[@"search"][@"sk"];
-        newsInfo.st = params[@"search"][@"st"];
-        newsInfo.unid = params[@"search"][@"unid"];
-        newsInfo.cid = params[@"search"][@"cid"];
+        NFHybridNewsInfo * newsInfo = [NFHybridNewsInfo convertToModel:params[@"search"]];
         
         // 初始化详情页
         NFHybridContainerController * detailVC = [[NewsFeedsHybridSDK sharedSDK] instantiateContainerWithNewsInfo:newsInfo];
@@ -222,21 +196,61 @@ NewsFeedsHybridSDK中提供的`instantiateInitialContainer`方法为信息流主
 }
 ```
 
-* share
+* openLink
 
-  当用户点击分享时，会发起该事件。事件参数是`platform`，`link`，`imgUrl`，`title`，`desc`。`platform`和`supportSharePlatforms`相同。该事件不关心返回结果。
-  
-  字段 | 描述
-  ----- | ----
-  platform | 分享平台 ，同`init`事件中的`supportSharePlatforms` 
-  link | 分享链接
-  imgUrl | 分享图标链接
-   title | 分享标题
-   desc  | 分享描述
+  在配置广告的情况下，点击打开广告时，会发起`openLink`事件。
+  用户可通过该事件拿到`url`参数跳转广告页。
+  如果未实现该事件，默认使用Safari打开广告。
+
+```objc
+- (BOOL)webViewContainer:(NFHybridContainerController *)container receiveEvent:(NSString *)event params:(NSDictionary *)params completion:(NFHybridSDKCallback)completion {
+    
+    if ([event isEqualToString:@"openLink"]) {
+        
+        // 获取url参数
+        NSString *url = params[@"url"];
+        NSString *type = params[@"type"];
+        
+        if ([type isEqualToString:@"ad"]) {
+            //根据url跳转广告页
+            ...
+        } 
+        return YES;
+    }
+    return NO;
+}
+```
+
+* negativeFeedBack
+
+点击列表页负反馈按钮(x关闭按钮)，如果在init事件中设置@"customNegativeFeedBack": @(YES)，会发起`negativeFeedBack`事件。
+用户可通过该事件拿到`feedbackInfo`参数自定义负反馈页面
+
+```objc
+- (BOOL)webViewContainer:(NFHybridContainerController *)container receiveEvent:(NSString *)event params:(NSDictionary *)params completion:(NFHybridSDKCallback)completion {
+
+if ([event isEqualToString:@"negativeFeedBack"]) {
+
+	NSArray *fbInfo = params[@"feedbackInfo"];
+	self.feedbackInfo = fbInfo;
+
+	//根据info绘制UI
+	...
+	//回传选中的value数组
+	completion(@{
+			//注意：此处value传递选中数组
+			@"dreason": @[self.feedbackInfo[0][@"value"]]
+		}
+		, nil);
+		return YES;
+	}
+	return NO;
+}
+```
 
 
 
-#### 3. 自定义导航栏´
+#### 3. 自定义导航栏
 
 SDK中提供了自定义导航栏的接口，若用户需要使用自定义导航栏，需设置`NFHybridContainerCustomNavigationBarDelegate`，并传当前的控制器。
 
@@ -269,4 +283,61 @@ SDK中提供了自定义导航栏的接口，若用户需要使用自定义导�
     }
 }
 ```
-´
+#### 4.设置分享点击回调
+```objc
+/**
+*  @method
+*
+*  @abstract
+*  设置NewsFeedsHybridSDKDelegate的分享点击回调
+*/
++ (void)setDelegate:(id<NewsFeedsHybridSDKDelegate>)delegate;
+```
+
+其中，NewsFeedsHybridSDKDelegate定义为：
+
+```objc
+/**
+*  @method
+*
+*  @abstract
+*  详情页面的分享按钮点击
+*
+*  @param shareInfo  分享需要用到的字段集合
+*  @param type       分享类型，0：微信好友  1：朋友圈
+*
+*  @discussion
+*  实现该回调，则分享按钮显示
+*  未实现该回调，则分享按钮隐藏
+*/
+- (void)onShareClick:(NSDictionary *)shareInfo
+				type:(NSInteger)type;
+```
+
+注意：
+
+- 实现该回调，则新闻详情页面、图集详情页面、视频页面都会显示分享按钮；未实现该回调，则不会显示分享按钮
+
+参考代码
+
+```objc
+- (void)onShareClick:(NSDictionary *)shareInfo
+				type:(NSInteger)type 
+{
+	NSMutableString *url = [shareInfo[@"shareUrl"] mutableCopy];
+
+	//拼接ios open url,scheme替换成用户app的。
+	[url appendFormat:@"&iou=%@", [self encodeParameter:[NSString stringWithFormat:@"youliao://youliao.163yun.com?infoId=%@&infoType=%@&producer=%@", shareInfo[@"infoId"], shareInfo[@"infoType"], shareInfo[@"producer"]]]];
+
+	//拼接android open url,scheme替换成用户app的。
+	[url appendFormat:@"&aou=%@", [self encodeParameter:[NSString stringWithFormat:@"youliao://youliao.163yun.com?infoId=%@&infoType=%@&producer=%@", shareInfo[@"infoId"], shareInfo[@"infoType"], shareInfo[@"producer"]]]];
+
+	//此处注意微信限制数据大小，超出则无法分享
+	[WXApiRequestHandler sendLinkURL:url
+							 TagName:shareInfo[@"infoType"]
+							   Title:shareInfo[@"title"]
+						 Description:shareInfo[@"summary"] ?  : shareInfo[@"source"]
+						  ThumbImage:shareInfo[@"thumbnail"]
+						     InScene:type];
+}
+```
