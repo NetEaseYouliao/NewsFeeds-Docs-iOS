@@ -33,14 +33,14 @@ SDK通过Web方式接入网易有料内容，并使用jsbridge使native能够完
      
     * 手动集成
      
-     网易有料NewsFeedsHybridSDK 可通过手动下载，并添加到项目中集成使用。
+    	网易有料NewsFeedsHybridSDK 可通过手动下载，并添加到项目中集成使用。
      
-		1. 将下载得到的NewsFeedsHybridSDK.framework和NFHybridBundle.bundle手动导入到工程中。
-		2. 下载NFUtilityFoundation，导入到工程中，下载链接为:[NFUtilityFoundation](https://github.com/NetEaseYouliao/NFUtilityFoundation)
-		3. 添加系统依赖库: WebKit，CoreFoundation
+	 	1. 将下载得到的NewsFeedsHybridSDK.framework和NFHybridBundle.bundle手动导入到工程中。
+	 	2. 下载NFUtilityFoundation，导入到工程中，下载链接为:[NFUtilityFoundation](https://github.com/NetEaseYouliao/NFUtilityFoundation)
+	 	3. 添加系统依赖库: WebKit，CoreFoundation
 					
-			<font color=red size=2 face="黑体">手动导入的时候系统库CoreFoundation.framework需要设置为Optional，如下图</font>![image](http://odotlq87m.bkt.clouddn.com/WechatIMG14.jpeg)
-		4. 在 Build Settings -> Other Linker Flags 里，添加选项 -ObjC。
+		 	<font color=red size=2 face="黑体">手动导入的时候系统库CoreFoundation.framework需要设置为Optional，如下图</font>![image](http://odotlq87m.bkt.clouddn.com/WechatIMG14.jpeg)
+	 	4. 在 Build Settings -> Other Linker Flags 里，添加选项 -ObjC。
 
      ​
 
