@@ -76,8 +76,6 @@ NewsFeedsSDK提供的功能如下：
 
     保证Build Phases -> Link Binary With Libraries中包含NewsFeedsSDK.framework
 
-    保证Build Phases -> Copy Bundle Resources中包含NFBundle.bundle
-
 3. 添加系统依赖库
 
     -   AdSupport.framework
